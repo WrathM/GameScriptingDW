@@ -1,0 +1,36 @@
+Dalan Wenner
+Guessing Game Pseudocode
+
+Initialize Random Number Generator
+Initialize totalGuesses Variable at 7
+Initialize userGusess Variable
+Initialize randomNumber Variable
+Initialize isGuessed Boolean at False
+Initialize exitGame Boolean at False
+
+WHILE exitGame is False, Loop this:
+    WHILE totalGusesses < 7 Loop this,
+        Prompt guess from the user
+        User guesses a number
+        Add 1 to totalGuesses
+        IF userGusess is = randomNumber
+            Set totalGusesses to 7
+            Set isGuessed to True
+        ELSE IF userGusess > randomNumber
+            Display "Too High, Try again" Message
+        ELSE
+            Disply "Too Low, Try again" Message
+    End of WHILE Loop - For totalGusses
+    IF isGuessed is True
+        Display Winning Message
+    ELSE
+        Display Loosing Message
+    Prompt user to Play Again 
+    IF NO
+        Display See You Next Time Message
+        Set exitGame to True
+    ELSE
+        Display Good Luck Message
+End of While Loop - For exitGame
+
+    
