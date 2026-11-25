@@ -1,0 +1,160 @@
+import pygame
+import random
+import sys
+
+# Initialize Pygame
+pygame.init()
+
+# Screen settings
+WIDTH = 800
+HEIGHT = 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Cabal Clicker")
+
+clock = pygame.time.Clock()
+
+# Load images
+chickenFace = pygame.image.load("chicken.png").convert_alpha()
+powerupImage = pygame.image.load("powerup.png").convert_alpha()
+backgroundImage = pygame.image.load("bg.png").convert()
+
+# Game variables
+powerupActive = False
+powerupTimer = 0
+powerupVisible = False
+powerupX = 0
+powerupY = 0
+spawnTimer = 0
+
+# Create five chickens at random positions
+startx = [
+    random.randint(0, WIDTH - chickenFace.get_width())
+    for _ in range(5)
+]
+
+starty = [
+    -random.randint(chickenFace.get_height(),
+                    chickenFace.get_height() * 2)
+    for _ in range(5)
+]
+
+running = True
+
+# Main game loop
+while running:
+
+    # Calculate delta time
+    dt = clock.tick(60) / 1000
+
+    # -------------------------
+    # EVENTS / MOUSE PRESS
+    # -------------------------
+    for event in pygame.event.get():
+
+        if event.type == pygame.QUIT:
+            running = False
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+
+                x, y = event.pos
+
+                # Check if a chicken was clicked
+                for i in range(len(startx)):
+
+                    chickenRect = pygame.Rect(
+                        startx[i],
+                        starty[i],
+                        chickenFace.get_width(),
+                        chickenFace.get_height()
+                    )
+
+                    if chickenRect.collidepoint(x, y):
+
+                        # Reset chicken position
+                        startx[i] = random.randint(
+                            0, WIDTH - chickenFace.get_width()
+                        )
+
+                        starty[i] = -random.randint(
+                            chickenFace.get_height(),
+                            chickenFace.get_height() * 2
+                        )
+
+                # Check if powerup was clicked
+                if powerupVisible:
+
+                    powerupRect = pygame.Rect(
+                        powerupX,
+                        powerupY,
+                        powerupImage.get_width(),
+                        powerupImage.get_height()
+                    )
+
+                    if powerupRect.collidepoint(x, y):
+
+                        powerupVisible = False
+                        powerupActive = True
+                        powerupTimer = 3
+
+    # -------------------------
+    # UPDATE
+    # -------------------------
+
+    # Spawn powerup every 10 seconds
+    if not powerupVisible and not powerupActive:
+
+        spawnTimer += dt
+
+        if spawnTimer >= 10:
+
+            spawnTimer = 0
+            powerupVisible = True
+
+            maxX = WIDTH - powerupImage.get_width()
+            maxY = HEIGHT - powerupImage.get_height()
+
+            powerupX = random.randint(0, maxX)
+            powerupY = random.randint(0, maxY)
+
+    # Update powerup timer
+    if powerupActive:
+
+        powerupTimer -= dt
+
+        if powerupTimer <= 0:
+
+            powerupActive = False
+            powerupTimer = 0
+
+    # Move chickens down
+    for i in range(len(starty)):
+
+        # Check if chicken hits the bottom
+        if starty[i] + chickenFace.get_height() >= HEIGHT:
+            running = False
+
+        if not powerupActive:
+
+            starty[i] += 80 * dt
+
+    # -------------------------
+    # DRAW
+    # -------------------------
+
+    screen.blit(backgroundImage, (0, 0))
+
+    # Draw chickens
+    for i in range(len(startx)):
+        screen.blit(chickenFace, (startx[i], starty[i]))
+
+    # Draw powerup
+    if powerupVisible:
+        screen.blit(powerupImage, (powerupX, powerupY))
+
+    # Update display
+    pygame.display.flip()
+
+# Quit game
+pygame.quit()
+sys.exit()
